@@ -29,10 +29,7 @@ Also, so far I've only tested these steps on a Raspberry Pi 2 Model B+ and a Ras
 ## What We'll Cover:
 
 - [Preparing the OS Image and Booting the Pi](#osprep)
-- [Enable the UART on the Pi](#enableuart)
-- [Connect the USB to Serial Cable](#usbtoserial)
-- [Install the Drivers](#drivers)
-- [Determine the USB to Serial Port](#usbport)
+- [Complete Adafruits USB to Serial Cable Tutorial](#adafruittut)
 
 ---
 
@@ -64,92 +61,15 @@ For example, the last version of Raspbian “Jessie” is at: http://downloads.r
 
 ---
 
-<a name="#enableuart"></a>
+<a name="adafruittut"></a>
 
-##  Enable the UART on the Pi
+## Complete Adafruits USB to Serial Cable Tutorial
 
-The clock speed on the Raspberry Pi 3s messes with the UART baud rate and will cause issues when we attempt to connect to it later with the USB to TTL Serial cable.  To fix the problem, we need to edit the `config.txt` file in the root of the Pi's SD card.
+I had started writing my own documentation to help you get the USB to Serial cable setup on your Pi and computer but I quickly realized I was really just stealing the work that Adafruit has already done so admirably.  Plus, they'll probably be able to keep their docs up to date easier than I can so...
 
-1. Make sure the Micro SD card with your Pi's OS is inserted into your computer, and locate the drive with the `boot` volume label.
+1. Complete "[Adafruit's Raspberry Pi Lesson 5. Using a Console Cable](https://learn.adafruit.com/adafruits-raspberry-pi-lesson-5-using-a-console-cable)" tutorial.  Make sure to get all they way through, and when you're done, return here for more goodness.
 
-1. Locate the `config.txt` file in the root of the `boot` partition and open the the `config.txt` file in the text editor of your choice.
-
-1. Add the following two lines to the bottom of the `config.txt` file and save the changes:
-
-    > **Note**: You should ensure that the `enable_uart` setting isn't being set somewhere else in the `config.txt` file already if this is a pre-existing OS image.
-
-    ```text
-    # Enable UART
-    enable_uart=1
-    ```
-
-1. Now you can safely eject the Micro SD card and insert it into your Raspberry Pi's SD card slot.
-
----
-
-<a name="drivers"></a>
-
-## Install the Drivers
-
-If you haven't use the USB to Serial cable before on your machine, you may need to install the drivers for it.  To keep it simple we'll just point you off to the instructions for [Adafruit's tutorial](https://learn.adafruit.com/adafruits-raspberry-pi-lesson-5-using-a-console-cable) on their cable:
-
-- [Software Installation (Mac)](https://learn.adafruit.com/adafruits-raspberry-pi-lesson-5-using-a-console-cable/software-installation-mac)
-- [Software Installation (Windows)](https://learn.adafruit.com/adafruits-raspberry-pi-lesson-5-using-a-console-cable/software-installation-windows)
-- [Software Installation (Linux)](https://learn.adafruit.com/adafruits-raspberry-pi-lesson-5-using-a-console-cable/software-installation-linux)
-
----
-
-<a name="usbtoserial"></a>
-
-## Connect the USB to Serial Cable
-
-1. Get a USB to TTL Serial FTDI Cable that supports 3.3v pins like this one from Adafruit: [USB to TTL Serial Cable - Debug / Console Cable for Raspberry Pi](https://www.adafruit.com/product/954)
-
-    ![USB to Serial Cable](images/usbtoserialcable.png)
-
-1. Connect the USB to Serial Cable to your Pi as follows:
-
-    | Cable Lead | Lead Color | Pin # | Pin Name  | 
-    | ---------- | ---------- | ----- | --------- |
-    | 5V         | Red        |   N/A | N/A       |
-    | GND        | Black      |     6 | GND       |
-    | TX         | White      |     8 | UART0_TXD |
-    | RX         | Green      |    10 | UART0_RXD |
-
-    ![USB to Serial Cable on Pi](images/ftdicableonpi.png)
-    ![USB to Serial Cable Closeup](images/ftdicableonpicloseup.png)
-
-1. Connext the USB end of the USB to Serial cable to a USB port on your computer.
-
----
-
-<a name="usbport"></a>
-
-## Determine the USB to Serial Port
-
-Next, you need to determine what serial port the USB to Serial cable is connected to on your computer.  The process for doing that is different on each platform.
-
-> **Note**: These steps are blatantly stolen from [Adafruit's awesome tutorial](https://learn.adafruit.com/adafruits-raspberry-pi-lesson-5-using-a-console-cable) on their cable.  For more detailed instructions, checkout: https://learn.adafruit.com/adafruits-raspberry-pi-lesson-5-using-a-console-cable/test-and-configure
-
-1. For Windows Users:
-
-    - Open the Windows "**Device Manager**"
-    - Expand "**Ports (COM & LPT)**"
-    - Find the "**Prolific**" (or other) Device and it's COM port Number.
-
-1. For Mac Users:
-
-
-
-
-
-
----
-
-<a name=""></a>
-
-## 
-
+    ![Adafruit Tutorial Web Page](images/adafruittut.png)
 
 ---
 
