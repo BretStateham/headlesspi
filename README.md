@@ -34,7 +34,8 @@ Also, so far I've only tested these steps on a Raspberry Pi 2 Model B+ and a Ras
 - [Boot the Pi](#boot)
 - [Connect via Serail](#connectserial)
 - [Enable SSH & VNC](#enableinterfaces)
-- [Configure the WiFi Network](#wificonfig)
+- [Configuring the WiFi Network](#wificonfig)
+- [Set the Pi's Hostname](#hostname)
 
 ---
 
@@ -183,12 +184,47 @@ At this point you can connect to your pi only from a computer that is attached u
 
 ## Configure the WiFi Network
 
-If you will be connecting you pi to a WiFi network using either the built-in WiFi adapter on the Raspberry Pi 3, or a USB WiFi adapter on the Pi 2 or Pi 3, you can configure the WiFi connection a number of ways. We'll cover two options
+The WiFi network configuration on the Pi is done using the [wpa_supplicant](https://wiki.archlinux.org/index.php/WPA_supplicant) by default. You can see this if you look at the default network interfaces configuration:
+
+```bash
+cat /etc/network/interfaces
+```
+
+You should see output similar to the following:
+
+```bash
+# interfaces(5) file used by ifup(8) and ifdown(8)
+
+# Please note that this file is written to be used with dhcpcd
+# For static IP, consult /etc/dhcpcd.conf and 'man dhcpcd.conf'
+
+# Include files from /etc/network/interfaces.d:
+source-directory /etc/network/interfaces.d
+
+auto lo
+iface lo inet loopback
+
+iface eth0 inet manual
+
+allow-hotplug wlan0
+iface wlan0 inet manual
+    wpa-conf /etc/wpa_supplicant/wpa_supplicant.conf
+
+allow-hotplug wlan1
+iface wlan1 inet manual
+    wpa-conf /etc/wpa_supplicant/wpa_supplicant.conf
+```
+Of specific interest is the configuration for `wlan0` and `wlan1`.  Both are set to:
+
+- Allow the wifi device to `allow-hotplug`.  This is handy on a Pi 2 if you have to attach a WiFi dongle to the pi after it is already running. 
+- Get their configuration from the `wpa-conf` via the `/etc/wpa_supplicant/wpa_supplicant.conf` file.
+
+Basically, that means you just need to edit `/etc/wpa_supplicant/wpa_supplicant.conf` with the specifics for your WiFi network (`ssid`,`psk`, etc).  However, you need to make sure you enter those values properly.  So you have two choices to edit the contents of that file to specify your WiFi newtwork configuration:
 
 - Using the `wpa_cli` 
 - Manually editing the `wpa_supplicant.conf` file
 
-The default configuration on Raspbian uses the "[wpa_supplicant](https://wiki.archlinux.org/index.php/WPA_supplicant)" to configure and connect your WiFi interface to a wifi network.
+### Sidebar on the WPA Supplicant
 
 What is a "supplicant"? [Vocabulary.com](https://www.vocabulary.com/dictionary/supplicant) explains it as follows:
 
@@ -199,18 +235,281 @@ Note the phrase "_**it can also be someone who begs earnestly for something he o
 - The WiFi Network SSID
 - The WiFi Network passphrase / password / Pre-shared key, if there is one
 
-
-
 ### Using the `wpa_cli`
 
-The `wpa_cli`
+1. From the prompt on the pi run:
+
+    ```bash
+    sudo wpa_cli
+    ```
+1. Inside the `wpi_cli` interactive prompt, first set the country for your device. For example, here's how to specify the `us` as the country (don't type the "`>`"):
+
+    ```bash
+    > set country us
+    ```
+
+1. Next, you can scan for available wifi networks, and view the results:
+
+    ```bash
+    > scan
+    > scan_results
+    ```
+
+    You should see a list of available WiFi Networks similar to the following (your list WILL be different and may wrap accross multiple lines):
+
+    ```bash
+    bssid / frequency / signal level / flags / ssid
+    f4:...:a3  2422  -66  [WPA2-PSK-CCMP][WPS][ESS]  MyWiFiNetwork
+    38:...:bb  2412  -70  [WPA2-PSK-CCMP][WPS][ESS]  SomeOtherWiFiNetwork
+    ...
+    ```
+1. Find your network in the list, in this example we'll use `MyWiFiNetwork`, and make sure you know the password, or `psk`, for that network. You'll need it in a couple of steps.
+
+1. In the `wpa_cli`interactive prompt, run:
+
+    ```bash
+    > add_network
+    ```
+
+    It should return a network number (should be `0` on a fresh Pi).  That number is the index of the network that was added to the config file. `0` is the first network, `1` is the second, etc.  Note that you CAN have multiple networks configured.  You can repeat this process to add the network configuration for all the WiFi networks you want your Pi to attempt to connect to.  It will connect to the first one it can, following the order they are defined.  If you are running this for additional networks replace the "`0`" in the commands that follow with the network index for the network you are configuring.
+
+    ```bash
+    0
+    ```
+    Next, set the ssid/psk for your new network config.  Replace the "`MyWiFiNetwork`" and "`MyWiFiPassword`" with the appropriate values for your network SSID and password.  
+
+    > **Note**: If the WiFi network you are connecting to is Open (doesn't require a password) rather than running `set_network 0 psk "MyWiFiPassword"` run `set_network 0 key_mgmt NONE`
+
+    ```bash
+    > set_network 0 ssid "MyWiFiNewtork"
+    > set_network 0 psk "MyWiFiPassword"
+    ```
+
+    Then, enable the network.  It should immediately attempt to connect:
+
+    ```bash
+    > enable_network 0
+    ```
+
+    IMPORTANT!!!! Make sure to save the configuration:
+
+    ```bash
+    > save_config
+    ```
+
+    Then you can quit the `wpa_cli` interactive prompt with:
+    
+    ```bash
+    quit
+    ```
+
+1. Verify the WiFi network configuration:
+
+    ```bash
+    sudo cat /etc/wpa_supplicant/wpa_supplicant.conf
+    ```
+
+    You should see output similar to the following:
+
+    ```bash
+    ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
+    update_config=1
+    country=US
+
+    network={
+            ssid="MyWiFiNetwork"
+            psk="MyWiFiPassword"
+    }
+    ```
+
+    Or, if this was an open network that didn't require a  password:
+
+    ```bash
+    ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
+    update_config=1
+    country=US
+
+    network={
+            ssid="MyWiFiNetwork"
+            key_mgmt NONE
+    }
+    ```
+
+### Manually editing the `wpa_supplicant.conf` file
+
+If you prefer to just manually edit the `wpa_supplicant.conf` file, you can certainly do so.  Just be careful to format it properly. 
+
+1. On the pi, open the `/etc/wpa_supplicant/wpa_supplicant.conf` file in a text editor (we'll use nano):
+
+    ```bash
+    sudo nano /etc/wpa_supplicant/wpa_supplicant.conf
+    ```
+1. Edit the contents of the file to meet your needs.  Here is an example of a simple WiFI network that just needs an SSID and Password (psk). Verify the [two letter country code](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) is correct for your device, and replace the "`MyWiFiNetwork`" and "`MyWiFiPassword`" with the appropriate values for your network SSID and password.
+
+    ```bash
+    ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
+    update_config=1
+    country=US
+
+    network={
+            ssid="MyWiFiNetwork"
+            psk="MyWiFiPassword"
+    }
+    ```
+
+    Or, if this was an open network that didn't require a  password:
+
+    ```bash
+    ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
+    update_config=1
+    country=US
+
+    network={
+            ssid="MyWiFiNetwork"
+            key_mgmt NONE
+    }
+    ```
+1. Save the changes to your file.  In nano:
+
+    - Press `CTRL-X` to exit
+    - Press `ENTER` to confirm the same file name
+    - Press `Y` to overwrite the existing. file.
+
+1. Verify that your WiFi adapter got its IP Address:
+
+    ```bash
+    ip -4 a
+    ```
+
+    You should see output similar to the following, look for the IP Address of `wlan0` (or whatever interface you are interested in). For example, in the output below, the `wlan0` interface's IPv4 address is `192.168.2.24` with a `24` bit subnet mask which really means it's subnet mas is `255.255.255.0`.
+
+    ```bash
+    1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1
+        inet 127.0.0.1/8 scope host lo
+        valid_lft forever preferred_lft forever
+    3: wlan0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UP group default qlen 1000
+        inet 192.168.2.24/24 brd 192.168.2.255 scope global wlan0
+        valid_lft forever preferred_lft forever
+    ```
+
+1. Another way to look at your Pi's ip address is with:
+
+    ```bash
+    ifconfig
+    ```
+
+    The output is just a little noisier, but if you look under `wlan0` for the `inet addr:` you should see the IP address for the WiFi network:
+
+    ```bash
+    eth0      Link encap:Ethernet  HWaddr b8:27:eb:95:eb:21
+            inet6 addr: fe80::8c70:f7a7:6fbd:3a7/64 Scope:Link
+            UP BROADCAST MULTICAST  MTU:1500  Metric:1
+            RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+            TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
+            collisions:0 txqueuelen:1000
+            RX bytes:0 (0.0 B)  TX bytes:0 (0.0 B)
+
+    lo        Link encap:Local Loopback
+            inet addr:127.0.0.1  Mask:255.0.0.0
+            inet6 addr: ::1/128 Scope:Host
+            UP LOOPBACK RUNNING  MTU:65536  Metric:1
+            RX packets:261 errors:0 dropped:0 overruns:0 frame:0
+            TX packets:261 errors:0 dropped:0 overruns:0 carrier:0
+            collisions:0 txqueuelen:1
+            RX bytes:20300 (19.8 KiB)  TX bytes:20300 (19.8 KiB)
+
+    wlan0     Link encap:Ethernet  HWaddr b8:27:eb:c0:be:74
+            inet addr:192.168.2.24  Bcast:192.168.2.255  Mask:255.255.255.0
+            inet6 addr: fe80::8a9:43db:3c5:50e1/64 Scope:Link
+            UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+            RX packets:99134 errors:0 dropped:0 overruns:0 frame:0
+            TX packets:65765 errors:0 dropped:0 overruns:0 carrier:0
+            collisions:0 txqueuelen:1000
+            RX bytes:137469393 (131.1 MiB)  TX bytes:12494038 (11.9 MiB)
+    ```
+
+1. Lastly, just FYI, you can also inspect your Pi's wireless network status with :
+
+    ```bash
+    iwconfig
+    ```
+
+    With output similar to the following:
+
+    ```bash
+    lo        no wireless extensions.
+
+    wlan0     IEEE 802.11  ESSID:"MyWiFiNetwork"
+            Mode:Managed  Frequency:2.422 GHz  Access Point: f4:xx:xx:xx:xx:a3
+            Bit Rate=7.2 Mb/s   Tx-Power=31 dBm
+            Retry short limit:7   RTS thr:off   Fragment thr:off
+            Power Management:on
+            Link Quality=44/70  Signal level=-66 dBm
+            Rx invalid nwid:0  Rx invalid crypt:0  Rx invalid frag:0
+            Tx excessive retries:176  Invalid misc:0   Missed beacon:0
+
+    eth0      no wireless extensions.
+    ```
 
 ---
 
-<a name=""></a>
+<a name="hostname"></a>
 
-## 
+## Set the Pi's Hostname
 
+By default, your pi is named "raspberrypi".  You will want to change that for each pi so you can easily refer to them on the network.
+
+The Pi broadcasts is hostname as "`<hostname>.local`" ("`raspberrypi.local`" by default) using the "[Multicast DNS (mDNS)](https://en.wikipedia.org/wiki/Multicast_DNS)" protocol.  By giving each pi a unique hostname, you will be able to refer to them easily by name rather than their IP address on your local network (note, .local names ONLY work locally, on the same network)
+
+There are two files where you need to update your hostname if you want to change it:
+
+    - `/etc/hostname` to set the name itself
+    - `/etc/hosts` to set the hostname for the local loopback address (`127.0.0.1`) so your pi can resolve its own name.
+
+1. You can manually edit each of those files using `nano`:
+
+    Start by editing `/etc/hostname`
+
+    ```bash
+    sudo nano /etc/hostname
+    ```
+
+    Replace `raspberrypi` with your new desired hostname, and save the changes (`CTRL-X`,`ENTER`,`Y` in nano):
+
+    ```
+    myhostname
+    ```
+
+    Then edit `/etc/hosts`
+
+    ```bash
+    sudo nano /etc/hosts
+    ```
+
+    Edit the `127.0.0.1` address (usually the last line) to point to your new hostname, and save your changes (`CTRL-X`,`ENTER`,`Y`)
+
+    ```bash
+    127.0.0.1       localhost
+    ::1             localhost ip6-localhost ip6-loopback
+    ff02::1         ip6-allnodes
+    ff02::2         ip6-allrouters
+
+    127.0.1.1       myhostname
+    ```
+
+1. Alternatively, you can use `raspi-config` to edit both of the files for you:
+
+    ```bash
+    sudo rasp-config nonint do_hostname "myhostname"
+    ```
+
+1. You should reboot your pi after giving it the new host name.  Go ahead and do that and then log back in when it comes up:
+
+    > **Note**: If you are still connected to the debug console via the USB to Serial cable, you don't need to re-connect.  It should stay connected during the reboot. Cool! SSH or VNC connections however will need to be re-established when the Pi is done rebooting.
+
+    ```bash
+    sudo reboot
+    ```
 
 ---
 
