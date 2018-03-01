@@ -689,7 +689,7 @@ If you want a more graphical remote connection to your Pi, you can use VNC.
 
     ![VNC Connection](images/VNCConnection.png)
 
-1. If you see a warining about SSH being enabled with the Pi's password still at default you can click "**OK***" to clear it.  However, you should consider changing your Pi user's password to help secure it. 
+1. If you see a warning about SSH being enabled with the Pi's password still at default you can click "**OK***" to clear it.  However, you should consider changing your Pi user's password to help secure it. 
 
     ![SSH Password Warning](images/SSHPasswordWarning.png)
 
@@ -842,6 +842,11 @@ If you will be developing code on the Pi that communicates with Azure IoT Hubs:
 
     ```bash
     pip install -U pip
+    ```
+1. Next install the Azure IoT Device SDK for Python using pip:
+
+    ```bash
+    pip install azure-iothub-device-client
     ```
 
 ---
