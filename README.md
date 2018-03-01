@@ -36,6 +36,7 @@ Also, so far I've only tested these steps on a Raspberry Pi 2 Model B+ and a Ras
 - [Enable SSH & VNC](#enableinterfaces)
 - [Configuring the WiFi Network](#wificonfig)
 - [Set the Pi's Hostname](#hostname)
+- [Configure SSH Keys](#sshkeys)
 
 ---
 
@@ -511,13 +512,81 @@ There are two files where you need to update your hostname if you want to change
     sudo reboot
     ```
 
+1. Then the pi has rebooted, from your computer (ON THE SAME NETWORK AS THE PI), verify you can ping your pi using:
+
+    ```bash
+    # Replace <hostname> with your Pi's hostname that you just set
+    ping <hostname>.local
+
+    # For example:
+    ping myhostname.local
+
+    #or
+
+    # Replace <your.pis.ip.address> with your Pi's IP address
+    ping <your.pis.ip.address>
+
+    # For example, if the Pi's ip address is 192.168.2.24:
+    ping 192.168.2.24
+    ```
+
+
+
 ---
 
-<a name=""></a>
+<a name="sshkeys"></a>
 
-## 
+## Configure SSH Keys
 
+If you don't want to have to provide the Raspberry Pi's password everytime you ssh into the pi from a remote computer, you can configure ssh keys to automatically authenticate you.
 
+1. On your computer (not on the pi), run the following command:
+
+    ```bash
+    ssh-keygen -t rsa -C "SSH Key for logging into the pi"
+    ```
+
+1. Next, from your computer, ssh into the pi normally, using the "`pi`" username and password (password defaults to `raspberry`).  Reaplace `your.pis.ip.address` below with the actual IP address for your pi (see above) or it's `<hostname>.local` mDNS name (again, see above):
+
+    ```bash
+    # Replace <hostname> with your Pi's hostname that you just set
+    ssh pi@<hostname>.local
+
+    # For example:
+    ssh pi@myhostname.local
+
+    #or
+
+    # Replace <your.pis.ip.address> with your Pi's IP address
+    ssh pi@<your.pis.ip.address>
+
+    # For example, if the Pi's ip address is 192.168.2.24:
+    ssh pi@192.168.2.24
+    ```
+
+1. Now, in the ssh session on the Pi, run the following commands to create and configure the `.ssh` folder where the Pi's copy of your ssh keys will be stored:
+
+    ```bash
+    cd ~
+    install -d -m 700 ~/.ssh
+    ```
+
+1. Back on your computer, run the following command, entering the password for the "`pi`" user one last time:
+
+    > **Note**: This command uses cat to display the contents of the ssh public key (`~/.ssh/id_rsa.pub`) on your computer, it sends that output to an ssh session to your pi, and into a command that uses `cat` to pipe the incoming content into the `.ssh/authorized_keys` file on the pi.  Basically copying your ssh public key over to the list of authorized public keys on the pi.
+
+    ```bash
+    cat ~/.ssh/id_rsa.pub | ssh pi@your.pi.ip.address 'cat >> .ssh/authorized_keys'
+    ```
+
+1. Finally, on your computer, you should now be able to ssh into the pi without having to enter the password:
+
+    ```bash
+    ssh pi@<hostname>.local
+
+    #or
+
+    ssh pi@<your.pis.ip.address>
 ---
 
 <a name=""></a>
