@@ -37,6 +37,11 @@ Also, so far I've only tested these steps on a Raspberry Pi 2 Model B+ and a Ras
 - [Configuring the WiFi Network](#wificonfig)
 - [Set the Pi's Hostname](#hostname)
 - [Configure SSH Keys](#sshkeys)
+- [Install and Configure Samba](#samba)
+- [Install and Configure Git](#git)
+- [OPTIONAL: Install Node.js](#nodejs)
+- [OPTIONAL: Install the Azure IoT Device SDK for Python](#azureiot)
+- [OPTIONAL: Configure SPI](#spiconfig)
 
 ---
 
@@ -589,49 +594,176 @@ If you don't want to have to provide the Raspberry Pi's password everytime you s
     ssh pi@<your.pis.ip.address>
 ---
 
-<a name=""></a>
+<a name="samba"></a>
 
-## 
+## Install and Configure Samba
 
+[Samba](https://www.samba.org/) is the Service Message Block (SMB) and Common Internet File System (CIFS) protocol implementation for Linux/Unix.  SMB/CIFS are the protocols used by Windows File Sharing.  Basically that means that if we install Samba on the pi, we can configure it to host "shares" that we can connect to from Windows, or other computers that also have "Samba" installed.
+
+The whole point here is to provide a convenient way to access the file system on the Pi as if it were a local drive on our development machine and allow us to edit files on the Pi as easily as we can edit local files.
+
+1. First, in a terminal prompt on the Pi, update the `apt-get` list of packages:
+
+    ```bash
+    sudo apt-get update
+    ```
+
+1. Next, go ahead and upgrade any packages on your pi that are out of date (THIS MAY TAKE A WHILE TO COMPLETE.  EVEN TEN MINUTES OR LONGER)
+
+    ```bash
+    sudo apt-get upgrade
+    ```
+
+1. Now, you can install Samba. This could take a couple of minutes to complete:
+
+    ```bash
+    sudo apt-get install -y samba samba-common-bin
+    ```
+
+1. Now that Samba is installed, we want to configure it. We'll start by renaming the original `/etc/samba/smb.conf` configuration file to `/etc/samba/smb.conf.original` so we have it available if we need it back:
+
+    ```bash
+    sudo mv /etc/samba/smb.conf /etc/samba/smb.conf.original
+    ```
+
+1. Next, use `nano` to create a new empty `/etc/samba/sbm.conf` file:
+
+    ```bash
+    sudo nano /etc/samba/smb.conf
+    ```
+
+1. Copy the following contents (or you can copy them from the [smb.conf](./smb.conf) file in this repo) in the new empy smb.conf file on the Pi.  You should be able to copy the contents into your clipboard on your local computer, then past them into the nano editor in the pi terminal session Save the changes to the file (`CTRL-X`,`ENTER`,`Y`):
+
+    > **Note**: This config file creates a share named `root` that shares the `/` path of the local file system.  Only the `pi` or `root` users can attach to the share though.
+
+    ```bash
+    [global]
+    workgroup = WORKGROUP
+    dns proxy = no
+    log file = /var/log/samba/log.%m
+    max log size = 1000
+    syslog = 0
+    panic action = /usr/share/samba/panic-action %d
+    server role = standalone server
+    passdb backend = tdbsam
+    obey pam restrictions = yes
+    unix password sync = yes
+    passwd program = /usr/bin/passwd %u
+    passwd chat = *Enter\snew\s*\spassword:* %n\n *Retype\snew\s*\spassword:* %n\n *password\supdated\ssuccessfully* .
+    pam password change = yes
+    map to guest = bad user
+    usershare allow guests = yes
+
+    [root]
+    comment = root
+    path=/
+    browseable=YES
+    writeable=YES
+    valid users= pi, root
+    only guest=no
+    create mask=0777
+    directory mask=07777
+    public=no
+    force user = root
+    ```
+1. Next, back at the terminal prompt on the Pi, we need to set the Samba password for the `pi` user, run the following command and enter the `pi` user names password twice.  YOU SHOULD USE THE SAME PASSWORD YOU USE TO LOGIN TO THE DEVICE AS THE `pi` USER:
+
+    ```bash
+    sudo smbpasswd -a pi
+    ```
+
+1. Back on your computer (assuming Windows here. for macOS users see [How to connect with File Sharing on your Mac](https://support.apple.com/en-us/HT204445)), open a NON-ADMINISTRATIVE command prompt (PowerShell or Command) and run the following command, again replacing "`your.pis.ip.address`" with your pis actual ip address , or "`<hostname>.local`" hostname and typing in the `pi` user's password when prompted:
+
+    > **Note**: The following command maps the "`P:`" drive letter on your Windows computer to the "`root`" file share on the Pi.  The "`/PERSISTENT:YES`" keeps the drive mapping in place even if you logout and back in on Windows. You can specifiy a different drive letter than "`P:`" if you wish.
+
+    ```bash
+    net use P: \\your.pi.ip.address\root /user:pi /persistent:yes
+    ```
+---
+
+<a name="git"></a>
+
+## Install and Configure Git
+
+Git is the most popular source contgrol mechanism these days.  To make sure you can easily work with git from the Pi:
+
+1. Ensure that git is up to date on the pi by running the following on the pi:
+
+    ```bash
+    sudo apt-get install git
+    ```
+
+1. Then configure your identity in git.  Replace "`Your Name`" and "`you@yourcompany.com`" with appropriate values:
+
+    ```bash
+    git config --global user.name "Your Name"
+    git config --global user.email "you@yourcompany.com"
+    ```
+
+1. You can optionally configure git more as described in [Getting Started - First-Time Git Setup](https://git-scm.com/book/en/v2/Getting-Started-First-Time-Git-Setup)
+---
+
+<a name="nodejs"></a>
+
+## OPTIONAL: Install Node.js
+
+If you will NOT be using Node.js applications, skip this step. There is an older version of Node.js install on the Pi by default.  Just leave it alone. 
+
+However, if you will be developing Node.js apps on your the pi, you should upgrade Node. to a later version.
+
+1. You MAY need to install the Build tools before installing Node.js.  Run the following on the Pi:
+
+    ```bash
+    sudo apt-get install -y cmake build-essential curl libcurl4-openssl-dev libssl-dev uuid-dev python-dev python-smbus
+    ```
+
+1. To install Node 8.x run:
+
+    > **Note**: See [Debian and Ubuntu based Linux distributions](https://nodejs.org/en/download/package-manager/#debian-and-ubuntu-based-linux-distributions) for current install info.
+
+    ```bash
+    curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
+    sudo apt-get install -y nodejs
+    ```
+---
+
+<a name="azureiot"></a>
+
+## OPTIONAL: Install the Azure IoT Device SDK for Python
+
+If you will be developing code on the Pi that communicates with Azure IoT Hubs:
+
+1. Upgrade pip to Version 9:
+
+    ```bash
+    pip install -U pip
+    ```
 
 ---
 
-<a name=""></a>
+<a name="spiconfig"></a>
 
-## 
+## OPTIONAL: Configure SPI
 
+The following steps configure the pi to use the Broadcom SPI drviers
 
----
+```bash
+sudo modprobe spi-bcm2835
 
-<a name=""></a>
+# Ensure SPI and I3C are enabled if you didn’t do so previously
+sudo raspi-config nonint do_ssh 0
+sudo raspi-config nonint do_vnc 0
 
-## 
-
-
----
-
-<a name=""></a>
-
-## 
-
-
----
-
-<a name=""></a>
-
-## 
-
-
----
-
-<a name=""></a>
-
-## 
-
+# Install BCM driver for python
+sudo modprobe spi-bcm2835
+sudo apt-get update
+sudo apt-get upgrade
+sudo apt-get install python-dev python3-dev
+cd ~
+git clone https://github.com/doceme/py-spidev.git
+cd py-spidev
+make
+sudo make install
+```
 
 ---
-
-<a name=""></a>
-
-## 
-
