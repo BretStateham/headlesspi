@@ -627,10 +627,10 @@ So you can see from above, we'll typically want to stick to `hdmi_group` `2` sin
 
 The `hdmi_mode` value you select depends on what `hdmi_group` you selected above.  Since you can read all about it [here](https://www.raspberrypi.org/documentation/configuration/config-txt/video.md), and we'll most likely be using `hdmi_group` `2`, I'll just list some likley `hdmi_mode` selections for `hdmi_group` `2`.  For more choices, refer to the [docs](https://www.raspberrypi.org/documentation/configuration/config-txt/video.md):
 
-    | HDMI_GROUP | HDMI_MODE | DESCRIPTION            |
-    | ---------: | --------: | :--------------------- |
-    |          2 |        82 | 1920x1080, 60HZ, 1080p |
-    |          2 |        85 | 1280x720, 60HZ, 720p   |
+| HDMI_GROUP | HDMI_MODE | DESCRIPTION            |
+| ---------: | --------: | :--------------------- |
+|          2 |        82 | 1920x1080, 60HZ, 1080p |
+|          2 |        85 | 1280x720, 60HZ, 720p   |
 
 ### Interactively Setting the Resolution with `raspi-config`
 
