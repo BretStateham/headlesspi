@@ -32,11 +32,13 @@ Also, so far I've only tested these steps on a Raspberry Pi 2 Model B+ and a Ras
 - [Complete Adafruits USB to Serial Cable Tutorial](#adafruittut)
 - [Enable UART](#enableuart)
 - [Boot the Pi](#boot)
-- [Connect via Serail](#connectserial)
+- [Connect via Serial](#connectserial)
 - [Enable SSH & VNC](#enableinterfaces)
 - [Configuring the WiFi Network](#wificonfig)
 - [Set the Pi's Hostname](#hostname)
 - [Configure SSH Keys](#sshkeys)
+- [Configure the Display Resolution](#displayresolution)
+- [Connecting with VNC](#vnc)
 - [Install and Configure Samba](#samba)
 - [Install and Configure Git](#git)
 - [OPTIONAL: Install Node.js](#nodejs)
@@ -139,7 +141,7 @@ The clock speed on the Raspberry Pi 3s messes with the UART baud rate and will c
 
 <a name="connectserial"></a>
 
-## Connect via Serail
+## Connect via Serial
 
 Again, you likely completed this already if you completed the Adafruit Tutorial above, but to ensure we are all starting from the same place:
 
@@ -164,7 +166,7 @@ At this point you can connect to your pi only from a computer that is attached u
 
 1. From the command prompt run the following two commands to enable ssh & vnc (or optionally run just the command for the interface you want to enable )
 
-    > **Note**: You can also enable the interfaces interactively by just running `sudo raspi-config`, navigating to `5 Interfacing Options` and iteratively selecting and enabling each interface.  The commands below just allow you to do it more directly and without any manual interaction required.
+    > **Note**: You can also enable the interfaces interactively by just running `sudo raspi-config`, navigating to `5 Interfacing Options` and iteratively selecting and enabling each interface.  The commands below just allow you to do it more directly and without any manual interaction required.  See the [raspi-config source code](https://github.com/raspberrypi-ui/rc_gui/blob/master/src/rc_gui.c#L23-L70) for other possible commands:
 
     ```bash
     # Enable the ssh interface on the pi
@@ -592,6 +594,107 @@ If you don't want to have to provide the Raspberry Pi's password everytime you s
     #or
 
     ssh pi@<your.pis.ip.address>
+
+---
+
+<a name="displayresolution"></a>
+
+## Configure the Display Resolution
+
+Even through your pi is "headless" (meaning no monitor, keyboard, and mouse), you may still care about what display resolution the Pi is configured to use if you will be connecting through a graphical client like VNC.
+
+The display configuration for your Pi is stored in the `/boot/config.txt` file (or, more specifially, the `config.txt` file on the `boot` partition).  You can learn more about the configuration options for the display from the [VIDEO OPTIONS IN CONFIG.TXT](https://www.raspberrypi.org/documentation/configuration/config-txt/video.md) document.
+
+Basically though, you need to pick an `hdmi_group` and an `hdmi_mode`.  
+
+Those settings need to be writtin into the `/boot/config.txt` file.  You could do that manually, just find the existing entries and edit them, or you can use `raspi-config` in either its interactive mode, or non-interactively from the command line.
+
+### hdmi_group
+
+Basically though, you need to pick an `hdmi_group`. The `hdmi_group` can be one of three values:
+
+| hdmi_group | Result                                   | Description                    | 
+| ---------: | ------                                   | ------------------------------ | 
+|          0 | Auto-detect from attached monitor's EDID | Won't work on a headless display because there is no monitor attached |
+|          1 | CEA                                      | Consumer Electronics Association, the standard typically used by TVs |
+|          2 | DMT                                      | Dipslay Monitor Timings, the standard typically used by monitors |
+
+So you can see from above, we'll typically want to stick to `hdmi_group` `2` since we don't have anything attached, and we aren't using an old-school television as our display.
+
+### hdmi_mode
+
+The `hdmi_mode` value you select depends on what `hdmi_group` you selected above.  Since you can read all about it [here]((https://www.raspberrypi.org/documentation/configuration/config-txt/video.md)), and we'll most likely be using `hdmi_group` `2`, I'll just list some likley `hdmi_mode` selections for `hdmi_group` `2`.  For more choices, refer to the [docs]((https://www.raspberrypi.org/documentation/configuration/config-txt/video.md)):
+
+    | HDMI_GROUP | HDMI_MODE | DESCRIPTION            |
+    | ---------: | --------: | :--------------------- |
+    |          2 |        82 | 1920x1080, 60HZ, 1080p |
+    |          2 |        85 | 1280x720, 60HZ, 720p   |
+
+### Interactively Setting the Resolution with `raspi-config`
+
+1. On the pi, run:
+
+    ```bash
+    sudo raspi-config
+    ```
+
+    Then within the interactive raspi-config interface, select:
+
+    - `7 Advanced Options`
+    - `A5 Resolution`
+    - Select your desired resolution from the list, and press `ENTER`
+    - Press `ENTER` to confirm
+    - Use the `TAB` keys to highlight `Finish` and press `ENTER`
+    - If you are ready to reboot now, select `Yes` and press `ENTER` to reboot.  Otherwise, select `No` and press `ENTER`.  Just make sure to reboot later.
+
+### Non-Interactively Setting the Resolution with `raspi-config`
+
+1. Run the following command replacing the `<hdmi_group>` and `<hdmi_mode>` place holders with appropriate values from above:
+
+    ```bash
+    sudo raspi-config nonint do_resolution <hdmi_group> <hdmi_mode>
+    ```
+
+    For example, to use `hdmi_group` `2` (DMT) and `hdmi_mode` `82` (1920x1080)
+
+    ```bash
+    sudo raspi-config nonint do_resolution 2 82
+    ```
+
+    When you are done, reboot the pi:
+
+    ```bash
+    sudo reboot
+    ```
+---
+<a name="vnc"></a>
+
+## Connecting with VNC
+
+If you want a more graphical remote connection to your Pi, you can use VNC.
+
+1. Ensure that you enabled VNC on the Pi, if you haven't already done so.  From the pi, run:
+
+    ```bash
+    sudo rasp-config nonint do_vnc 0
+    ```
+
+1. Download a VNC Viewer Client application for your platform.  I recommend Real VNC Viewer, but any client should work:
+
+    Download and install [Real VNC Viewer](https://www.realvnc.com/en/connect/download/viewer/)
+
+1. Use VNC Viewer to connect to your Raspberry Pi, specifying either the pi's IP address or <hostname>.local to connect.
+
+    ![VNC Connection](images/VNCConnection.png)
+
+1. If you see a warining about SSH being enabled with the Pi's password still at default you can click "**OK***" to clear it.  However, you should consider changing your Pi user's password to help secure it. 
+
+    ![SSH Password Warning](images/SSHPasswordWarning.png)
+
+1. If you are using the Real VNC Viewer, this is a toolbar that will appear if you move your mouse to the top center of the VNC display area. From there you can click buttons to control your VNC session including going Full-Screen.  If you do go full screen and need to get out, again just move your mouse to the top center of the VNC display to re-access the toolbar:
+
+    ![VNC Session Toolbar](images/VNCViewerToolbar.png)
+
 ---
 
 <a name="samba"></a>
