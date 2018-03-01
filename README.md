@@ -1,4 +1,6 @@
-# headlesspi
+# Headless Pi
+
+![Headless Pi Logo](images/headlesspi_small.png)
 
 This repo outlines steps for working with a Raspberry Pi from your computer without a monitor, keyboard or mouse attached to the pi.
 
