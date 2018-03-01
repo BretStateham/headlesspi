@@ -609,11 +609,11 @@ The display configuration for your Pi is stored in the `/boot/config.txt` file (
 
 Basically though, you need to pick an `hdmi_group` and an `hdmi_mode`.  
 
-Those settings need to be writtin into the `/boot/config.txt` file.  You could do that manually, just find the existing entries and edit them, or you can use `raspi-config` in either its interactive mode, or non-interactively from the command line.
+Those settings need to be written into the `/boot/config.txt` file.  You could do that manually, just find the existing entries and edit them, or you can use `raspi-config` in either its interactive mode, or non-interactively from the command line.
 
 ### hdmi_group
 
-Basically though, you need to pick an `hdmi_group`. The `hdmi_group` can be one of three values:
+The `hdmi_group` can be one of three values:
 
 | hdmi_group | Result                                   | Description                    | 
 | ---------: | ------                                   | ------------------------------ | 
@@ -625,7 +625,7 @@ So you can see from above, we'll typically want to stick to `hdmi_group` `2` sin
 
 ### hdmi_mode
 
-The `hdmi_mode` value you select depends on what `hdmi_group` you selected above.  Since you can read all about it [here]((https://www.raspberrypi.org/documentation/configuration/config-txt/video.md)), and we'll most likely be using `hdmi_group` `2`, I'll just list some likley `hdmi_mode` selections for `hdmi_group` `2`.  For more choices, refer to the [docs]((https://www.raspberrypi.org/documentation/configuration/config-txt/video.md)):
+The `hdmi_mode` value you select depends on what `hdmi_group` you selected above.  Since you can read all about it [here](https://www.raspberrypi.org/documentation/configuration/config-txt/video.md), and we'll most likely be using `hdmi_group` `2`, I'll just list some likley `hdmi_mode` selections for `hdmi_group` `2`.  For more choices, refer to the [docs](https://www.raspberrypi.org/documentation/configuration/config-txt/video.md):
 
     | HDMI_GROUP | HDMI_MODE | DESCRIPTION            |
     | ---------: | --------: | :--------------------- |
