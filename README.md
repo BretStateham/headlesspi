@@ -861,8 +861,8 @@ The following steps configure the pi to use the Broadcom SPI drviers
 sudo modprobe spi-bcm2835
 
 # Ensure SPI and I3C are enabled if you didn’t do so previously
-sudo raspi-config nonint do_ssh 0
-sudo raspi-config nonint do_vnc 0
+sudo raspi-config nonint do_i2c 0
+sudo raspi-config nonint do_spi 0
 
 # Install BCM driver for python
 sudo modprobe spi-bcm2835
