@@ -858,8 +858,6 @@ If you will be developing code on the Pi that communicates with Azure IoT Hubs:
 The following steps configure the pi to use the Broadcom SPI drviers
 
 ```bash
-sudo modprobe spi-bcm2835
-
 # Ensure SPI and I3C are enabled if you didn’t do so previously
 sudo raspi-config nonint do_i2c 0
 sudo raspi-config nonint do_spi 0
@@ -868,7 +866,7 @@ sudo raspi-config nonint do_spi 0
 sudo modprobe spi-bcm2835
 sudo apt-get update
 sudo apt-get upgrade
-sudo apt-get install python-dev python3-dev
+sudo apt-get install python-dev python2.7-dev
 cd ~
 git clone https://github.com/doceme/py-spidev.git
 cd py-spidev
