@@ -382,8 +382,8 @@ If you prefer to just manually edit the `wpa_supplicant.conf` file, you can cert
 1. Save the changes to your file.  In nano:
 
     - Press `CTRL-X` to exit
-    - Press `ENTER` to confirm the same file name
-    - Press `Y` to overwrite the existing. file.
+    - Press `Y` to save.
+    - Press `ENTER` to confirm the file name
 
 1. Verify that your WiFi adapter got its IP Address:
 
@@ -484,7 +484,7 @@ There are two files where you need to update your hostname if you want to change
     sudo nano /etc/hostname
     ```
 
-    Replace `raspberrypi` with your new desired hostname, and save the changes (`CTRL-X`,`ENTER`,`Y` in nano):
+    Replace `raspberrypi` with your new desired hostname, and save the changes (`CTRL-X`,`Y`,`ENTER` in nano):
 
     ```
     myhostname
@@ -496,7 +496,7 @@ There are two files where you need to update your hostname if you want to change
     sudo nano /etc/hosts
     ```
 
-    Edit the `127.0.0.1` address (usually the last line) to point to your new hostname, and save your changes (`CTRL-X`,`ENTER`,`Y`)
+    Edit the `127.0.0.1` address (usually the last line) to point to your new hostname, and save your changes (`CTRL-X`,`Y`,`ENTER`)
 
     ```bash
     127.0.0.1       localhost
@@ -737,7 +737,7 @@ The whole point here is to provide a convenient way to access the file system on
     sudo nano /etc/samba/smb.conf
     ```
 
-1. Copy the following contents (or you can copy them from the [smb.conf](./smb.conf) file in this repo) in the new empy smb.conf file on the Pi.  You should be able to copy the contents into your clipboard on your local computer, then past them into the nano editor in the pi terminal session Save the changes to the file (`CTRL-X`,`ENTER`,`Y`):
+1. Copy the following contents (or you can copy them from the [smb.conf](./smb.conf) file in this repo) in the new empy smb.conf file on the Pi.  You should be able to copy the contents into your clipboard on your local computer, then past them into the nano editor in the pi terminal session Save the changes to the file (`CTRL-X`,`Y`,`ENTER`):
 
     > **Note**: This config file creates a share named `root` that shares the `/` path of the local file system.  Only the `pi` or `root` users can attach to the share though.
 
@@ -841,12 +841,12 @@ If you will be developing code on the Pi that communicates with Azure IoT Hubs:
 1. Upgrade pip to Version 9:
 
     ```bash
-    pip install -U pip
+    sudo pip install -U pip
     ```
 1. Next install the Azure IoT Device SDK for Python using pip:
 
     ```bash
-    pip install azure-iothub-device-client
+    sudo pip install azure-iothub-device-client
     ```
 
 ---
