@@ -838,11 +838,19 @@ However, if you will be developing Node.js apps on your the pi, you should upgra
 
 If you will be developing code on the Pi that communicates with Azure IoT Hubs:
 
+> **Note**: For more information, or for instructions on building the sdk manually, refer to the "[Prepare your development environment](https://github.com/Azure/azure-iot-sdk-python/blob/master/doc/python-devbox-setup.md)" documentation for the [Microsoft Azure IoT SDKs for Python](https://github.com/Azure/azure-iot-sdk-python) repo.
+
 1. Upgrade pip to Version 9:
 
     ```bash
     sudo pip install -U pip
     ```
+1. Ensure that libboost is installed:
+
+    ```bash
+    sudo apt-get install libboost1.55-all
+    ```
+
 1. Next install the Azure IoT Device SDK for Python using pip:
 
     ```bash
