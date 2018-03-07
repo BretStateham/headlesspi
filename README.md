@@ -863,7 +863,7 @@ If you will be developing code on the Pi that communicates with Azure IoT Hubs:
 
 ## OPTIONAL: Configure SPI
 
-The following steps configure the pi to use the Broadcom SPI drviers
+The following steps allow access to the peripherals on the pi (GPIO, I2C, SPI)
 
 ```bash
 # Ensure SPI and I2C are enabled if you didn’t do so previously
@@ -871,6 +871,7 @@ sudo raspi-config nonint do_i2c 0
 sudo raspi-config nonint do_spi 0
 
 sudo apt-get update
+sudo apt-get upgrade
 sudo apt-get install build-essential python-pip python-dev python-smbus git
 git clone https://github.com/adafruit/Adafruit_Python_GPIO.git
 cd Adafruit_Python_GPIO
