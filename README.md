@@ -731,7 +731,7 @@ The whole point here is to provide a convenient way to access the file system on
     sudo mv /etc/samba/smb.conf /etc/samba/smb.conf.original
     ```
 
-1. Next, use `nano` to create a new empty `/etc/samba/sbm.conf` file:
+1. Next, use `nano` to create a new empty `/etc/samba/smb.conf` file:
 
     ```bash
     sudo nano /etc/samba/smb.conf
@@ -866,20 +866,17 @@ If you will be developing code on the Pi that communicates with Azure IoT Hubs:
 The following steps configure the pi to use the Broadcom SPI drviers
 
 ```bash
-# Ensure SPI and I3C are enabled if you didn’t do so previously
+# Ensure SPI and I2C are enabled if you didn’t do so previously
 sudo raspi-config nonint do_i2c 0
 sudo raspi-config nonint do_spi 0
 
-# Install BCM driver for python
-sudo modprobe spi-bcm2835
 sudo apt-get update
-sudo apt-get upgrade
-sudo apt-get install python-dev python2.7-dev
-cd ~
-git clone https://github.com/doceme/py-spidev.git
-cd py-spidev
-make
-sudo make install
+sudo apt-get install build-essential python-pip python-dev python-smbus git
+git clone https://github.com/adafruit/Adafruit_Python_GPIO.git
+cd Adafruit_Python_GPIO
+sudo python setup.py install
+cd ..
+sudo rm -rf Adafruit_Python_GPIO
 ```
 
 ---
