@@ -510,7 +510,7 @@ There are two files where you need to update your hostname if you want to change
 1. Alternatively, you can use `raspi-config` to edit both of the files for you:
 
     ```bash
-    sudo rasp-config nonint do_hostname "myhostname"
+    sudo raspi-config nonint do_hostname "myhostname"
     ```
 
 1. You should reboot your pi after giving it the new host name.  Go ahead and do that and then log back in when it comes up:
