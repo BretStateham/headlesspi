@@ -35,6 +35,7 @@ Also, so far I've only tested these steps on a Raspberry Pi 2 Model B+ and a Ras
 - [Enable UART](#enableuart)
 - [Boot the Pi](#boot)
 - [Connect via Serial](#connectserial)
+- [Update Raspbian](#updateraspbian)
 - [Enable SSH & VNC](#enableinterfaces)
 - [Configuring the WiFi Network](#wificonfig)
 - [Set the Pi's Hostname](#hostname)
@@ -55,21 +56,25 @@ Also, so far I've only tested these steps on a Raspberry Pi 2 Model B+ and a Ras
 
 If you already have a Pi up and running with an OS, you don't need to do this task.  You can skip down to and move on.
 
-1. Download the image for the Raspbian OS as a “.zip” (DON'T get NOOBs) from:
+1.  Download the image for the Raspbian OS as a “.zip” (DON'T get NOOBs) from:
 
-    > **Note**: There isn't anything wrong with NOOBS, but we don't need it, and this repo doesn't document the extra steps you'll need to use it, so just download the OS as a ".zip".  Again though if you already have a Pi that you got running using NOOBs, you can certainly use it, just skip down to ... and continue!
+    > **Note**: There isn't anything wrong with NOOBS, but we don't need it,
+    > and this repo doesn't document the extra steps you'll need to use it,
+    > so just download the OS as a ".zip".  Again though if you already have
+    > a Pi that you got running using NOOBs, you can certainly use it, just
+    > skip down to ... and continue!
 
     https://www.raspberrypi.org/downloads/raspbian/
 
+1.  If you need an older version, checkout: [http://downloads.raspberrypi.org/raspbian/images/](http://downloads.raspberrypi.org/raspbian/images/).
 
-1. If you need an older version, checkout: http://downloads.raspberrypi.org/raspbian/images/
-For example, the last version of Raspbian “Jessie” is at: http://downloads.raspberrypi.org/raspbian/images/images/raspbian-2017-07-05/2017-07-05-raspbian-jessie.zip
+    For example, the last version of Raspbian “Jessie” is at: [http://downloads.raspberrypi.org/raspbian/images/images/raspbian-2017-07-05/2017-07-05-raspbian-jessie.zip](http://downloads.raspberrypi.org/raspbian/images/images/raspbian-2017-07-05/2017-07-05-raspbian-jessie.zip)
 
-1. Download and install Etcher.io for your platform fromhttps://etcher.io/
+1.  Download and install Etcher.io for your platform from [https://etcher.io/](https://etcher.io/)
 
-1. Insert the Micro-SD card for the pi into your computer
+1.  Insert the Micro-SD card for the pi into your computer
 
-1. Use Etcher.io to flash the OS image “.zip” file to the SD card.  It should be pretty obvious but:
+1.  Use Etcher.io to flash the OS image “.zip” file to the SD card.  It should be pretty obvious but:
 
     - Pick the Raspbian OS ".zip" file you downloaded previously as the "Image"
     - Select the Micro SD card you inserted above as the "Drive"
@@ -83,7 +88,7 @@ For example, the last version of Raspbian “Jessie” is at: http://downloads.r
 
 I had started writing my own documentation to help you get the USB to Serial cable setup on your Pi and computer but I quickly realized I was really just stealing the work that Adafruit has already done so admirably.  Plus, they'll probably be able to keep their docs up to date easier than I can so...
 
-1. Complete "[Adafruit's Raspberry Pi Lesson 5. Using a Console Cable](https://learn.adafruit.com/adafruits-raspberry-pi-lesson-5-using-a-console-cable)" tutorial.  Make sure to get all they way through, and when you're done, return here for more goodness.
+1.  Complete "[Adafruit's Raspberry Pi Lesson 5. Using a Console Cable](https://learn.adafruit.com/adafruits-raspberry-pi-lesson-5-using-a-console-cable)" tutorial.  Make sure to get all they way through, and when you're done, return here for more goodness.
 
     ![Adafruit Tutorial Web Page](images/AdafruitTutorial.png)
 
@@ -97,20 +102,22 @@ If you completed the Adafruit Tutorial above you should have done this already, 
 
 The clock speed on the Raspberry Pi 3s messes with the UART baud rate and will cause issues when we attempt to connect to it later with the USB to TTL Serial cable.  To fix the problem, we need to edit the `config.txt` file in the root of the Pi's SD card.
 
-1. Make sure the Micro SD card with your Pi's OS is inserted into your computer, and locate the drive with the `boot` volume label.
+1.  Make sure the Micro SD card with your Pi's OS is inserted into your computer, and locate the drive with the `boot` volume label.
 
-1. Locate the `config.txt` file in the root of the `boot` partition and open the the `config.txt` file in the text editor of your choice.
+1.  Locate the `config.txt` file in the root of the `boot` partition and open the the `config.txt` file in the text editor of your choice.
 
-1. Add the following two lines to the bottom of the `config.txt` file and save the changes:
+1.  Add the following two lines to the bottom of the `config.txt` file and save the changes:
 
-    > **Note**: You should ensure that the `enable_uart` setting isn't being set somewhere else in the `config.txt` file already if this is a pre-existing OS image.
+    > **Note**: You should ensure that the `enable_uart` setting isn't 
+    > being set somewhere else in the `config.txt` file already if 
+    > this is a pre-existing OS image.
 
     ```text
     # Enable UART
     enable_uart=1
     ```
 
-1. Now you can safely eject the Micro SD card and insert it into your Raspberry Pi's SD card slot.
+1.  Now you can safely eject the Micro SD card and insert it into your Raspberry Pi's SD card slot.
 
 ---
 
@@ -118,16 +125,17 @@ The clock speed on the Raspberry Pi 3s messes with the UART baud rate and will c
 
 ## Boot the Pi
 
-1. Ensure that, in the following order:
+1.  Ensure that, in the following order:
 
     - The Micro SD card is inserted into the SD Card slot on the back of the Pi
     - The USB to Serial cable to the Pi's leads are properly connected to the Pi
-        | Lead | Pin            | 
-        | ---- | -------------- |
-        |   5V | Not Connected  |
-        |  GND |  6 (GND)       |
-        |   TX |  8 (UART0_TXD) |
-        |   RX | 10 (UART0_RXD) |
+
+      | Lead | Pin            | 
+      | ---- | -------------- |
+      |   5V | Not Connected  |
+      |  GND |  6 (GND)       |
+      |   TX |  8 (UART0_TXD) |
+      |   RX | 10 (UART0_RXD) |
 
     - The USB end of the USB to serial cable is connected to your computer
     - If you are on a Raspberry Pi 2 and want to use WiFi, that a WiFi dongle is plugged into a USB port.
@@ -135,7 +143,7 @@ The clock speed on the Raspberry Pi 3s messes with the UART baud rate and will c
 
     ![USB to Serial cable connection closeup](images/USBToSerialCableCableOnPiCloseUp.png)
 
-1. Once you have ensured all of the above, you can connect the Micro USB power supply to the Pi to boot it.
+1.  Once you have ensured all of the above, you can connect the Micro USB power supply to the Pi to boot it.
 
     ![Connect and Boot the Pi](images/ConnectAndBoot.gif)
 
@@ -147,14 +155,39 @@ The clock speed on the Raspberry Pi 3s messes with the UART baud rate and will c
 
 Again, you likely completed this already if you completed the Adafruit Tutorial above, but to ensure we are all starting from the same place:
 
-1. Use the steps from the [Test & Configure](https://learn.adafruit.com/adafruits-raspberry-pi-lesson-5-using-a-console-cable/test-and-configure) page of "[Adafruit's Raspberry Pi Lesson 5. Using a Console Cable](https://learn.adafruit.com/adafruits-raspberry-pi-lesson-5-using-a-console-cable)" tutorial to connect to your Raspberry Pi over the USB to Serial cable using a terminal program on your computer. 
+1.  Use the steps from the [Test & Configure](https://learn.adafruit.com/adafruits-raspberry-pi-lesson-5-using-a-console-cable/test-and-configure) page of "[Adafruit's Raspberry Pi Lesson 5. Using a Console Cable](https://learn.adafruit.com/adafruits-raspberry-pi-lesson-5-using-a-console-cable)" tutorial to connect to your Raspberry Pi over the USB to Serial cable using a terminal program on your computer. 
 
-1. Login to the Pi:
+1.  Login to the Pi:
 
-    > **Note**: You may need to press the `ENTER` or key on your keyboard in the terminal once connected to get to the login prompt.  Also, if you have already changed the credentials on your Pi, use those instead.
+    > **Note**: You may need to press the `ENTER` or key on your keyboard
+    > in the terminal once connected to get to the login prompt.  Also,
+    > if you have already changed the credentials on your Pi, use those instead.
 
     - User Name: `pi`
     - Password: `raspberry`
+
+---
+
+<a name="updateraspbian"></a>
+
+## Update Raspbian
+
+Before we start using our new Raspbian image, we should make sure it is up to date.  
+
+1.  First, update the list of packages for `apt-get`
+
+    ```bash
+    sudo apt-get update
+    ```
+
+1.  Then upgrade any packages that need it:
+
+    > **Note**: Depending on your network speed, and the performance of your SD card, this can take some time to complete.  
+
+    ```bash
+    sudo apt-get -y upgrade
+    ```
+
 
 ---
 
@@ -164,22 +197,19 @@ Again, you likely completed this already if you completed the Adafruit Tutorial 
 
 At this point you can connect to your pi only from a computer that is attached using the USB to Serial cable. If you want to connect to your pi over the network, you will need to enable ssh and/or vnc on the pi.
 
-1. Ensure you are connected to your Pi over the USB to Serial cable in and logged in as described above.  
+1.  Ensure you are connected to your Pi over the USB to Serial cable in and logged in as described above.  
 
-1. From the command prompt run the following two commands to enable ssh & vnc (or optionally run just the command for the interface you want to enable )
+1.  From the command prompt run the following two commands to enable ssh & vnc (or optionally run just the command for the interface you want to enable )
 
     > **Note**: You can also enable the interfaces interactively by just running `sudo raspi-config`, navigating to `5 Interfacing Options` and iteratively selecting and enabling each interface.  The commands below just allow you to do it more directly and without any manual interaction required.  See the [raspi-config source code](https://github.com/raspberrypi-ui/rc_gui/blob/master/src/rc_gui.c#L23-L70) for other possible commands:
 
     ```bash
-    # Enable the ssh interface on the pi
+    # Enable the ssh and vnc interfaces on the pi
     # The "0" means "enable".  "1" would mean "disable"
     sudo raspi-config nonint do_ssh 0
-
-    # Enable the ssh interface on the pi
-    # The "0" means "enable".  "1" would mean "disable"
     sudo raspi-config nonint do_vnc 0
     ```
-1. You can optionally choose to enable other interfaces now as well, or as mentioned you can interactively run `sudo raspi-config` to configure other options like `Hostname`, `Localization Options`, `Interfacing Options` and more.
+1.  You can optionally choose to enable other interfaces now as well, or as mentioned you can interactively run `sudo raspi-config` to configure other options like `Hostname`, `Localization Options`, `Interfacing Options` and more.
 
     ```bash
     # Enable the ssh camera, i2c and spi interfaces
@@ -201,6 +231,8 @@ cat /etc/network/interfaces
 ```
 
 You should see output similar to the following:
+
+> **Note**: The output below is from a Raspbian Jessie image.  The `/etc/network/interfaces` file on Raspbian Stretch looks different.  I haven't had time to suss out what is going on with Raspbian Stretch yet.  Regardless, the information is still relevant to Raspbian Strech, and the steps work as documented.
 
 ```bash
 # interfaces(5) file used by ifup(8) and ifdown(8)
@@ -247,18 +279,18 @@ Note the phrase "_**it can also be someone who begs earnestly for something he o
 
 ### Using the `wpa_cli`
 
-1. From the prompt on the pi run:
+1.  From the prompt on the pi run:
 
     ```bash
     sudo wpa_cli
     ```
-1. Inside the `wpi_cli` interactive prompt, first set the country for your device. For example, here's how to specify the `us` as the country (don't type the "`>`"):
+1.  Inside the `wpi_cli` interactive prompt, first set the country for your device. For example, here's how to specify the `us` as the country (don't type the "`>`"):
 
     ```bash
-    > set country us
+    > set country US
     ```
 
-1. Next, you can scan for available wifi networks, and view the results:
+1.  Next, you can scan for available wifi networks, and view the results:
 
     ```bash
     > scan
@@ -273,9 +305,9 @@ Note the phrase "_**it can also be someone who begs earnestly for something he o
     38:...:bb  2412  -70  [WPA2-PSK-CCMP][WPS][ESS]  SomeOtherWiFiNetwork
     ...
     ```
-1. Find your network in the list, in this example we'll use `MyWiFiNetwork`, and make sure you know the password, or `psk`, for that network. You'll need it in a couple of steps.
+1.  Find your network in the list, in this example we'll use `MyWiFiNetwork`, and make sure you know the password, or `psk`, for that network. You'll need it in a couple of steps.
 
-1. In the `wpa_cli`interactive prompt, run:
+1.  In the `wpa_cli`interactive prompt, run:
 
     ```bash
     > add_network
@@ -288,7 +320,7 @@ Note the phrase "_**it can also be someone who begs earnestly for something he o
     ```
     Next, set the ssid/psk for your new network config.  Replace the "`MyWiFiNetwork`" and "`MyWiFiPassword`" with the appropriate values for your network SSID and password.  
 
-    > **Note**: If the WiFi network you are connecting to is Open (doesn't require a password) rather than running `set_network 0 psk "MyWiFiPassword"` run `set_network 0 key_mgmt NONE`
+    > **Note**: If the WiFi network you are connecting to is Open (doesn't require a password) rather than running `set_network 0 psk "MyWiFiPassword"` run `set_network 0 key_mgmt=NONE`
 
     ```bash
     > set_network 0 ssid "MyWiFiNewtork"
@@ -313,7 +345,7 @@ Note the phrase "_**it can also be someone who begs earnestly for something he o
     quit
     ```
 
-1. Verify the WiFi network configuration:
+1.  Verify the WiFi network configuration:
 
     ```bash
     sudo cat /etc/wpa_supplicant/wpa_supplicant.conf
@@ -341,7 +373,7 @@ Note the phrase "_**it can also be someone who begs earnestly for something he o
 
     network={
             ssid="MyWiFiNetwork"
-            key_mgmt NONE
+            key_mgmt=NONE
     }
     ```
 
@@ -349,12 +381,12 @@ Note the phrase "_**it can also be someone who begs earnestly for something he o
 
 If you prefer to just manually edit the `wpa_supplicant.conf` file, you can certainly do so.  Just be careful to format it properly. 
 
-1. On the pi, open the `/etc/wpa_supplicant/wpa_supplicant.conf` file in a text editor (we'll use nano):
+1.  On the pi, open the `/etc/wpa_supplicant/wpa_supplicant.conf` file in a text editor (we'll use nano):
 
     ```bash
     sudo nano /etc/wpa_supplicant/wpa_supplicant.conf
     ```
-1. Edit the contents of the file to meet your needs.  Here is an example of a simple WiFI network that just needs an SSID and Password (psk). Verify the [two letter country code](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) is correct for your device, and replace the "`MyWiFiNetwork`" and "`MyWiFiPassword`" with the appropriate values for your network SSID and password.
+1.  Edit the contents of the file to meet your needs.  Here is an example of a simple WiFI network that just needs an SSID and Password (psk). Verify the [two letter country code](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) is correct for your device, and replace the "`MyWiFiNetwork`" and "`MyWiFiPassword`" with the appropriate values for your network SSID and password.
 
     ```bash
     ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
@@ -376,16 +408,29 @@ If you prefer to just manually edit the `wpa_supplicant.conf` file, you can cert
 
     network={
             ssid="MyWiFiNetwork"
-            key_mgmt NONE
+            key_mgmt=NONE
     }
     ```
-1. Save the changes to your file.  In nano:
+1.  Save the changes to your file.  In nano:
 
     - Press `CTRL-X` to exit
     - Press `Y` to save.
     - Press `ENTER` to confirm the file name
 
-1. Verify that your WiFi adapter got its IP Address:
+### Verifying your Raspberry Pi's IP Address
+
+1.  Once you have configured your WiFi network using one of the methods above, you should reboot your pi.  This will be necessary on Raspbian Stretch as it appears the WiFi network doesn't get enabled if it isn't configured on boot.
+
+    ```bash
+    sudo reboot
+    ```
+
+1.  Then login to your Raspberry Pi using the default credentials (or your custom credentials if you have changed them):
+
+    - Username: `pi`
+    - Password: `raspberry`
+
+1.  Verify that your WiFi adapter got its IP Address:
 
     ```bash
     ip -4 a
@@ -402,7 +447,7 @@ If you prefer to just manually edit the `wpa_supplicant.conf` file, you can cert
         valid_lft forever preferred_lft forever
     ```
 
-1. Another way to look at your Pi's ip address is with:
+1.  Another way to look at your Pi's ip address is with:
 
     ```bash
     ifconfig
@@ -438,7 +483,7 @@ If you prefer to just manually edit the `wpa_supplicant.conf` file, you can cert
             RX bytes:137469393 (131.1 MiB)  TX bytes:12494038 (11.9 MiB)
     ```
 
-1. Lastly, just FYI, you can also inspect your Pi's wireless network status with :
+1.  Lastly, just FYI, you can also inspect your Pi's wireless network status with :
 
     ```bash
     iwconfig
@@ -476,7 +521,7 @@ There are two files where you need to update your hostname if you want to change
     - `/etc/hostname` to set the name itself
     - `/etc/hosts` to set the hostname for the local loopback address (`127.0.0.1`) so your pi can resolve its own name.
 
-1. You can manually edit each of those files using `nano`:
+1.  You can manually edit each of those files using `nano`:
 
     Start by editing `/etc/hostname`
 
@@ -507,13 +552,13 @@ There are two files where you need to update your hostname if you want to change
     127.0.1.1       myhostname
     ```
 
-1. Alternatively, you can use `raspi-config` to edit both of the files for you:
+1.  Alternatively, you can use `raspi-config` to edit both of the files for you:
 
     ```bash
     sudo raspi-config nonint do_hostname "myhostname"
     ```
 
-1. You should reboot your pi after giving it the new host name.  Go ahead and do that and then log back in when it comes up:
+1.  You should reboot your pi after giving it the new host name.  Go ahead and do that and then log back in when it comes up:
 
     > **Note**: If you are still connected to the debug console via the USB to Serial cable, you don't need to re-connect.  It should stay connected during the reboot. Cool! SSH or VNC connections however will need to be re-established when the Pi is done rebooting.
 
@@ -521,7 +566,7 @@ There are two files where you need to update your hostname if you want to change
     sudo reboot
     ```
 
-1. Then the pi has rebooted, from your computer (ON THE SAME NETWORK AS THE PI), verify you can ping your pi using:
+1.  Then the pi has rebooted, from your computer (ON THE SAME NETWORK AS THE PI), verify you can ping your pi using:
 
     ```bash
     # Replace <hostname> with your Pi's hostname that you just set
@@ -549,13 +594,13 @@ There are two files where you need to update your hostname if you want to change
 
 If you don't want to have to provide the Raspberry Pi's password everytime you ssh into the pi from a remote computer, you can configure ssh keys to automatically authenticate you.
 
-1. On your computer (not on the pi), run the following command:
+1.  On your computer (not on the pi), run the following command:
 
     ```bash
     ssh-keygen -t rsa -C "SSH Key for logging into the pi"
     ```
 
-1. Next, from your computer, ssh into the pi normally, using the "`pi`" username and password (password defaults to `raspberry`).  Reaplace `your.pis.ip.address` below with the actual IP address for your pi (see above) or it's `<hostname>.local` mDNS name (again, see above):
+1.  Next, from your computer, ssh into the pi normally, using the "`pi`" username and password (password defaults to `raspberry`).  Reaplace `your.pis.ip.address` below with the actual IP address for your pi (see above) or it's `<hostname>.local` mDNS name (again, see above):
 
     ```bash
     # Replace <hostname> with your Pi's hostname that you just set
@@ -573,14 +618,14 @@ If you don't want to have to provide the Raspberry Pi's password everytime you s
     ssh pi@192.168.2.24
     ```
 
-1. Now, in the ssh session on the Pi, run the following commands to create and configure the `.ssh` folder where the Pi's copy of your ssh keys will be stored:
+1.  Now, in the ssh session on the Pi, run the following commands to create and configure the `.ssh` folder where the Pi's copy of your ssh keys will be stored:
 
     ```bash
     cd ~
     install -d -m 700 ~/.ssh
     ```
 
-1. Back on your computer, run the following command, entering the password for the "`pi`" user one last time:
+1.  Back on your computer, run the following command, entering the password for the "`pi`" user one last time:
 
     > **Note**: This command uses cat to display the contents of the ssh public key (`~/.ssh/id_rsa.pub`) on your computer, it sends that output to an ssh session to your pi, and into a command that uses `cat` to pipe the incoming content into the `.ssh/authorized_keys` file on the pi.  Basically copying your ssh public key over to the list of authorized public keys on the pi.
 
@@ -588,7 +633,7 @@ If you don't want to have to provide the Raspberry Pi's password everytime you s
     cat ~/.ssh/id_rsa.pub | ssh pi@your.pi.ip.address 'cat >> .ssh/authorized_keys'
     ```
 
-1. Finally, on your computer, you should now be able to ssh into the pi without having to enter the password:
+1.  Finally, on your computer, you should now be able to ssh into the pi without having to enter the password:
 
     ```bash
     ssh pi@<hostname>.local
@@ -629,12 +674,13 @@ The `hdmi_mode` value you select depends on what `hdmi_group` you selected above
 
 | HDMI_GROUP | HDMI_MODE | DESCRIPTION            |
 | ---------: | --------: | :--------------------- |
+|          2 |        39 | 1360x768, 60HZ         |
 |          2 |        82 | 1920x1080, 60HZ, 1080p |
 |          2 |        85 | 1280x720, 60HZ, 720p   |
 
 ### Interactively Setting the Resolution with `raspi-config`
 
-1. On the pi, run:
+1.  On the pi, run:
 
     ```bash
     sudo raspi-config
@@ -651,7 +697,7 @@ The `hdmi_mode` value you select depends on what `hdmi_group` you selected above
 
 ### Non-Interactively Setting the Resolution with `raspi-config`
 
-1. Run the following command replacing the `<hdmi_group>` and `<hdmi_mode>` place holders with appropriate values from above:
+1.  Run the following command replacing the `<hdmi_group>` and `<hdmi_mode>` place holders with appropriate values from above:
 
     ```bash
     sudo raspi-config nonint do_resolution <hdmi_group> <hdmi_mode>
@@ -675,25 +721,25 @@ The `hdmi_mode` value you select depends on what `hdmi_group` you selected above
 
 If you want a more graphical remote connection to your Pi, you can use VNC.
 
-1. Ensure that you enabled VNC on the Pi, if you haven't already done so.  From the pi, run:
+1.  Ensure that you enabled VNC on the Pi, if you haven't already done so.  From the pi, run:
 
     ```bash
     sudo rasp-config nonint do_vnc 0
     ```
 
-1. Download a VNC Viewer Client application for your platform.  I recommend Real VNC Viewer, but any client should work:
+1.  Download a VNC Viewer Client application for your platform.  I recommend Real VNC Viewer, but any client should work:
 
     Download and install [Real VNC Viewer](https://www.realvnc.com/en/connect/download/viewer/)
 
-1. Use VNC Viewer to connect to your Raspberry Pi, specifying either the pi's IP address or <hostname>.local to connect.
+1.  Use VNC Viewer to connect to your Raspberry Pi, specifying either the pi's IP address or <hostname>.local to connect.
 
     ![VNC Connection](images/VNCConnection.png)
 
-1. If you see a warning about SSH being enabled with the Pi's password still at default you can click "**OK***" to clear it.  However, you should consider changing your Pi user's password to help secure it. 
+1.  If you see a warning about SSH being enabled with the Pi's password still at default you can click "**OK***" to clear it.  However, you should consider changing your Pi user's password to help secure it. 
 
     ![SSH Password Warning](images/SSHPasswordWarning.png)
 
-1. If you are using the Real VNC Viewer, this is a toolbar that will appear if you move your mouse to the top center of the VNC display area. From there you can click buttons to control your VNC session including going Full-Screen.  If you do go full screen and need to get out, again just move your mouse to the top center of the VNC display to re-access the toolbar:
+1.  If you are using the Real VNC Viewer, this is a toolbar that will appear if you move your mouse to the top center of the VNC display area. From there you can click buttons to control your VNC session including going Full-Screen.  If you do go full screen and need to get out, again just move your mouse to the top center of the VNC display to re-access the toolbar:
 
     ![VNC Session Toolbar](images/VNCViewerToolbar.png)
 
@@ -707,37 +753,37 @@ If you want a more graphical remote connection to your Pi, you can use VNC.
 
 The whole point here is to provide a convenient way to access the file system on the Pi as if it were a local drive on our development machine and allow us to edit files on the Pi as easily as we can edit local files.
 
-1. First, in a terminal prompt on the Pi, update the `apt-get` list of packages:
+1.  First, in a terminal prompt on the Pi, update the `apt-get` list of packages:
 
     ```bash
     sudo apt-get update
     ```
 
-1. Next, go ahead and upgrade any packages on your pi that are out of date (THIS MAY TAKE A WHILE TO COMPLETE.  EVEN TEN MINUTES OR LONGER)
+1.  Next, go ahead and upgrade any packages on your pi that are out of date (THIS MAY TAKE A WHILE TO COMPLETE.  EVEN TEN MINUTES OR LONGER)
 
     ```bash
-    sudo apt-get upgrade
+    sudo apt-get -y upgrade
     ```
 
-1. Now, you can install Samba. This could take a couple of minutes to complete:
+1.  Now, you can install Samba. This could take a couple of minutes to complete:
 
     ```bash
     sudo apt-get install -y samba samba-common-bin
     ```
 
-1. Now that Samba is installed, we want to configure it. We'll start by renaming the original `/etc/samba/smb.conf` configuration file to `/etc/samba/smb.conf.original` so we have it available if we need it back:
+1.  Now that Samba is installed, we want to configure it. We'll start by renaming the original `/etc/samba/smb.conf` configuration file to `/etc/samba/smb.conf.original` so we have it available if we need it back:
 
     ```bash
     sudo mv /etc/samba/smb.conf /etc/samba/smb.conf.original
     ```
 
-1. Next, use `nano` to create a new empty `/etc/samba/smb.conf` file:
+1.  Next, use `nano` to create a new empty `/etc/samba/smb.conf` file:
 
     ```bash
     sudo nano /etc/samba/smb.conf
     ```
 
-1. Copy the following contents (or you can copy them from the [smb.conf](./smb.conf) file in this repo) in the new empy smb.conf file on the Pi.  You should be able to copy the contents into your clipboard on your local computer, then past them into the nano editor in the pi terminal session Save the changes to the file (`CTRL-X`,`Y`,`ENTER`):
+1.  Copy the following contents (or you can copy them from the [smb.conf](./smb.conf) file in this repo) in the new empy smb.conf file on the Pi.  You should be able to copy the contents into your clipboard on your local computer, then past them into the nano editor in the pi terminal session Save the changes to the file (`CTRL-X`,`Y`,`ENTER`):
 
     > **Note**: This config file creates a share named `root` that shares the `/` path of the local file system.  Only the `pi` or `root` users can attach to the share though.
 
@@ -771,13 +817,13 @@ The whole point here is to provide a convenient way to access the file system on
     public=no
     force user = root
     ```
-1. Next, back at the terminal prompt on the Pi, we need to set the Samba password for the `pi` user, run the following command and enter the `pi` user names password twice.  YOU SHOULD USE THE SAME PASSWORD YOU USE TO LOGIN TO THE DEVICE AS THE `pi` USER:
+1.  Next, back at the terminal prompt on the Pi, we need to set the Samba password for the `pi` user, run the following command and enter the `pi` user names password twice.  YOU SHOULD USE THE SAME PASSWORD YOU USE TO LOGIN TO THE DEVICE AS THE `pi` USER:
 
     ```bash
     sudo smbpasswd -a pi
     ```
 
-1. Back on your computer (assuming Windows here. for macOS users see [How to connect with File Sharing on your Mac](https://support.apple.com/en-us/HT204445)), open a NON-ADMINISTRATIVE command prompt (PowerShell or Command) and run the following command, again replacing "`your.pis.ip.address`" with your pis actual ip address , or "`<hostname>.local`" hostname and typing in the `pi` user's password when prompted:
+1.  Back on your computer (assuming Windows here. for macOS users see [How to connect with File Sharing on your Mac](https://support.apple.com/en-us/HT204445)), open a NON-ADMINISTRATIVE command prompt (PowerShell or Command) and run the following command, again replacing "`your.pis.ip.address`" with your pis actual ip address , or "`<hostname>.local`" hostname and typing in the `pi` user's password when prompted:
 
     > **Note**: The following command maps the "`P:`" drive letter on your Windows computer to the "`root`" file share on the Pi.  The "`/PERSISTENT:YES`" keeps the drive mapping in place even if you logout and back in on Windows. You can specifiy a different drive letter than "`P:`" if you wish.
 
@@ -792,20 +838,20 @@ The whole point here is to provide a convenient way to access the file system on
 
 Git is the most popular source contgrol mechanism these days.  To make sure you can easily work with git from the Pi:
 
-1. Ensure that git is up to date on the pi by running the following on the pi:
+1.  Ensure that git is up to date on the pi by running the following on the pi:
 
     ```bash
     sudo apt-get install git
     ```
 
-1. Then configure your identity in git.  Replace "`Your Name`" and "`you@yourcompany.com`" with appropriate values:
+1.  Then configure your identity in git.  Replace "`Your Name`" and "`you@yourcompany.com`" with appropriate values:
 
     ```bash
     git config --global user.name "Your Name"
     git config --global user.email "you@yourcompany.com"
     ```
 
-1. You can optionally configure git more as described in [Getting Started - First-Time Git Setup](https://git-scm.com/book/en/v2/Getting-Started-First-Time-Git-Setup)
+1.  You can optionally configure git more as described in [Getting Started - First-Time Git Setup](https://git-scm.com/book/en/v2/Getting-Started-First-Time-Git-Setup)
 ---
 
 <a name="nodejs"></a>
@@ -816,13 +862,13 @@ If you will NOT be using Node.js applications, skip this step. There is an older
 
 However, if you will be developing Node.js apps on your the pi, you should upgrade Node. to a later version.
 
-1. You MAY need to install the Build tools before installing Node.js.  Run the following on the Pi:
+1.  You MAY need to install the Build tools before installing Node.js.  Run the following on the Pi:
 
     ```bash
     sudo apt-get install -y cmake build-essential curl libcurl4-openssl-dev libssl-dev uuid-dev python-dev python-smbus
     ```
 
-1. To install Node 8.x run:
+1.  To install Node 8.x run:
 
     > **Note**: See [Debian and Ubuntu based Linux distributions](https://nodejs.org/en/download/package-manager/#debian-and-ubuntu-based-linux-distributions) for current install info.
 
@@ -840,21 +886,44 @@ If you will be developing code on the Pi that communicates with Azure IoT Hubs:
 
 > **Note**: For more information, or for instructions on building the sdk manually, refer to the "[Prepare your development environment](https://github.com/Azure/azure-iot-sdk-python/blob/master/doc/python-devbox-setup.md)" documentation for the [Microsoft Azure IoT SDKs for Python](https://github.com/Azure/azure-iot-sdk-python) repo.
 
-1. Upgrade pip to Version 9:
+The Raspbian image includes both Python 2.7 and Python 3.4 installations.  You install the Azure IoT SDKs differently for each of them.
+
+### Python 2.7
+
+1.  Upgrade pip to Version 9:
 
     ```bash
     sudo pip install -U pip
     ```
-1. Ensure that libboost is installed:
+1.  Ensure that libboost is installed:
 
     ```bash
     sudo apt-get install libboost1.55-all
     ```
 
-1. Next install the Azure IoT Device SDK for Python using pip:
+1.  Next install the Azure IoT Device SDK for Python using pip:
 
     ```bash
     sudo pip install azure-iothub-device-client
+    ```
+
+### Python 3.4
+
+1.  Upgrade pip to Version 9:
+
+    ```bash
+    sudo python3 -m pip install -U pip
+    ```
+1.  Ensure that libboost is installed:
+
+    ```bash
+    sudo apt-get install libboost1.55-all
+    ```
+
+1.  Next install the Azure IoT Device SDK for Python using pip:
+
+    ```bash
+    sudo python3 -m pip install azure-iothub-device-client
     ```
 
 ---
@@ -870,14 +939,21 @@ The following steps allow access to the peripherals on the pi (GPIO, I2C, SPI)
 sudo raspi-config nonint do_i2c 0
 sudo raspi-config nonint do_spi 0
 
+# Ensure you have the latest libraries installed
 sudo apt-get update
 sudo apt-get upgrade
-sudo apt-get install build-essential python-pip python-dev python-smbus git
-git clone https://github.com/adafruit/Adafruit_Python_GPIO.git
-cd Adafruit_Python_GPIO
-sudo python setup.py install
-cd ..
-sudo rm -rf Adafruit_Python_GPIO
+```
+
+### Python 2.7
+
+```bash
+sudo python -m pip install adafruit-gpio
+```
+
+### Python 3.4
+
+```bash
+sudo python3 -m pip install adafruit-gpio
 ```
 
 ---
