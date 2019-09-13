@@ -218,6 +218,63 @@ At this point you can connect to your pi only from a computer that is attached u
     sudo raspi-config nonint do_i2c 0
     sudo raspi-config nonint do_spi 0
     ```
+
+1.  It appears that sometimes the SSH keys on the pi itself can be set wrong.  See [this post](https://www.raspberrypi.org/forums/viewtopic.php?t=177111).  If you are trying to ssh into your raspberry pi, and get an immediate response similar to `Connection closed by 192.168.2.58 port 22`, but with your pi's ip address, you can try the following steps to fix it:
+
+    1.  First, connect using the USB-to-Serial cable as described above, and login to your pi
+    1.  List the the keys in the /etc/ssh folder using:
+
+        ```bash
+        ls  -al /etc/ssh/ssh*key*
+        ```
+
+    1.  If the key files are show zero byte file sizes, similar to this:
+
+        ```bash
+        -rw-------   1 root root      0 Apr  8 03:30 ssh_host_dsa_key
+        -rw-r--r--   1 root root      0 Apr  8 03:30 ssh_host_dsa_key.pub
+        -rw-------   1 root root      0 Apr  8 03:30 ssh_host_ecdsa_key
+        -rw-r--r--   1 root root      0 Apr  8 03:30 ssh_host_ecdsa_key.pub
+        -rw-------   1 root root      0 Apr  8 03:30 ssh_host_ed25519_key
+        -rw-r--r--   1 root root      0 Apr  8 03:30 ssh_host_ed25519_key.pub
+        -rw-------   1 root root      0 Apr  8 03:30 ssh_host_rsa_key
+        -rw-r--r--   1 root root      0 Apr  8 03:30 ssh_host_rsa_key.pub
+        ```
+
+    1.  Delete the zero'd out key files with:
+
+        ```bash
+        sudo rm -r /etc/ssh/ssh*key*
+        ```
+
+    1.  Then re-configure the openssh-server component, which should create new key pairs:
+
+        ```bash
+        sudo dpkg-reconfigure openssh-server
+        ```
+
+    1.  Verify the new keys by listing them again, and verifying non-zero byte file sizes:
+
+        ```bash
+        ls  -al /etc/ssh/ssh*key*
+        ```
+
+        ```
+        -rw------- 1 root root  227 Sep 13 11:13 /etc/ssh/ssh_host_ecdsa_key
+        -rw-r--r-- 1 root root  174 Sep 13 11:13 /etc/ssh/ssh_host_ecdsa_key.pub
+        -rw------- 1 root root  399 Sep 13 11:13 /etc/ssh/ssh_host_ed25519_key
+        -rw-r--r-- 1 root root   94 Sep 13 11:13 /etc/ssh/ssh_host_ed25519_key.pub
+        -rw------- 1 root root 1675 Sep 13 11:13 /etc/ssh/ssh_host_rsa_key
+        -rw-r--r-- 1 root root  394 Sep 13 11:13 /etc/ssh/ssh_host_rsa_key.pub
+        ```
+
+    1.  Finally, verify you can ssh into the pi from a remote machine.
+
+        > **Note**: If you were somehow successful in logging into pi from the remote machine previously, the pi's key will have changed and ssh will still fail.  Remove the old pi key from the remote host by running the following ON THE REMOTE HOST, NOT THE PI, substituting your pi's ip address or hostname:
+
+        ```bash
+        ssh-keygen -f "/home/bstateha/.ssh/known_hosts" -R "your.pi.ip.address"
+        ```
 ---
 
 <a name="wificonfig"></a>
